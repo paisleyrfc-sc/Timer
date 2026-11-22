@@ -99,6 +99,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* my station */
 .mine{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;display:flex;flex-direction:column;gap:6px}
 .mine .lab{color:var(--muted);font-weight:600;letter-spacing:.1em;font-size:13px;text-transform:uppercase}
+.mine .cardhead{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.mine .left{font-family:var(--display);font-weight:800;font-size:40px;line-height:1;font-variant-numeric:tabular-nums}
 .mine .kit{font-family:var(--display);font-weight:800;font-size:clamp(32px,9vw,52px);line-height:1;text-transform:uppercase;color:var(--move)}
 .mine .how{color:var(--muted)}
 .tips{margin:2px 0 0;padding-left:1.1em;display:flex;flex-direction:column;gap:2px;font-size:17px}
@@ -475,7 +477,10 @@ button{font:inherit;color:inherit;cursor:pointer}
     box.hidden = !show;
     if(!show) return;
     var s = myStation(ph), st = ACT[s];
-    box.appendChild(el("div","lab",(ph.kind === "change" ? "Move to station " : "You are on station ")+(s+1)));
+    var head = el("div","cardhead");
+    head.appendChild(el("div","lab",(ph.kind === "change" ? "Move to station " : "You are on station ")+(s+1)));
+    var left = el("div","left",""); left.id = "cardleft"; head.appendChild(left);
+    box.appendChild(head);
     box.appendChild(el("div","kit",st.kit));
     box.appendChild(el("div","how",st.how + (st.two && shared(S.count) ? " " + st.two : "")));
     if(st.cues && ph.lap){ var ul = el("ul","tips"); st.cues.forEach(function(c){ ul.appendChild(el("li","",c)); }); box.appendChild(ul); }
@@ -592,6 +597,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       lastSec = sec;
 
       $("count").textContent = x >= total ? "DONE" : fmt(rem);
+      var cl = $("cardleft"); if(cl) cl.textContent = x >= total ? "" : fmt(rem);
       var gone = Math.floor(x);
       $("gone").textContent = fmt(gone);
       $("togo").textContent = fmt(total - gone);
