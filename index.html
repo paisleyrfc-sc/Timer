@@ -16,6 +16,8 @@
   --work:#ff8b3d;
   --easy:#3fd0c1;
   --move:#ffd84d;
+  --go:#3ddc84;
+  --stop:#ff5a5f;
   --display:"Avenir Next Condensed","Roboto Condensed","Arial Narrow",system-ui,sans-serif;
   --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
@@ -96,15 +98,18 @@ button{font:inherit;color:inherit;cursor:pointer}
 .levels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
 .levels button{background:transparent;border:2px solid var(--line);border-radius:12px;padding:10px 4px;font-family:var(--display);font-weight:800;font-size:22px}
 .levels button[aria-pressed="true"]{border-color:var(--text);background:var(--text);color:var(--bg)}
-.mine .doing{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:18px 14px;margin-top:6px;text-align:center;display:flex;flex-direction:column;gap:10px}
+.mine .doing{background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:18px 14px;margin-top:6px;text-align:center;display:flex;flex-direction:column;gap:10px}
 .mine .task{font-size:25px;font-weight:600;line-height:1.25;text-wrap:balance}
 .mine .state:empty{display:none}
 .mine .effort{text-align:center;display:flex;flex-direction:column;gap:2px;margin-top:6px}
 .mine .effort b{font-weight:600;font-size:18px}
 .mine .effort span{color:var(--muted);font-size:15px}
 .mine .state{font-family:var(--display);font-weight:800;font-size:clamp(44px,13vw,72px);line-height:1;text-transform:uppercase;font-variant-numeric:tabular-nums}
-.mine .state.go{color:var(--work)}
-.mine .state.off{color:var(--easy)}
+.mine .state.go{color:var(--go)}
+.mine .state.off{color:var(--stop)}
+.mine .doing.go{border-color:var(--go)}
+.mine .doing.off{border-color:var(--stop)}
+.mine .later{color:var(--muted);font-size:15px}
 .mine .then{color:var(--muted);border-top:1px solid var(--line);padding-top:8px;margin-top:4px}
 .mine .then b{color:var(--text)}
 
@@ -117,8 +122,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .lvrow{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:8px;align-items:baseline;padding:6px 0 0;margin-top:6px;border-top:1px solid var(--line);font-size:15.5px}
 .lvrow .l{font-family:var(--display);font-weight:800;font-size:18px;color:var(--muted)}
 .lvrow .s{font-family:var(--display);font-weight:800;font-size:18px;font-variant-numeric:tabular-nums;text-transform:uppercase;white-space:nowrap}
-.lvrow .s.go{color:var(--work)}
-.lvrow .s.off{color:var(--easy)}
+.lvrow .s.go{color:var(--go)}
+.lvrow .s.off{color:var(--stop)}
 
 .cues{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
 .cues ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px;font-size:19px;max-width:65ch}
@@ -471,8 +476,14 @@ button{font:inherit;color:inherit;cursor:pointer}
     });
     box.appendChild(lv);
     var doing = el("div","doing");
-    doing.appendChild(el("div","task",st.lv[S.level].t));
-    var state = el("div","state",""); state.id = "state"; doing.appendChild(state);
+    if(ph.lap){
+      // warm-up lap: everyone at a steady pace, no intervals; the level is only being chosen for later
+      doing.appendChild(el("div","task","Steady, easy pace. No intervals."));
+      doing.appendChild(el("div","later","Level "+(S.level+1)+" in the circuit: "+st.lv[S.level].t));
+    } else {
+      doing.appendChild(el("div","task",st.lv[S.level].t));
+      var state = el("div","state",""); state.id = "state"; doing.appendChild(state);
+    }
     box.appendChild(doing);
     if(ph.zone){
       var eff = el("div","effort");
@@ -587,6 +598,7 @@ button{font:inherit;color:inherit;cursor:pointer}
             var m = cycleAt(mp, e, ph.dur);
             se.textContent = (m.work ? (lv.on || "Go") : (lv.off || "Easy"))+" "+fmt(m.left);
             se.className = "state "+(m.work ? "go" : "off");
+            se.parentNode.className = "doing "+(m.work ? "go" : "off");
             if(S.running && lastWork !== null && lastWork !== m.work){ tone(990,0.08); tone(990,0.08,0.14); }
             lastWork = m.work;
           } else if(se){ se.textContent = ""; }
