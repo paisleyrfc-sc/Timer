@@ -41,6 +41,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .goals h3{font-family:var(--display);font-weight:800;font-size:22px;text-transform:uppercase;margin:0 0 6px;text-wrap:balance}
 .goals ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:4px;font-size:15.5px}
 .setup .goals p{margin:8px 0 0;font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:8px}
+.agerow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;font-size:14px;color:var(--muted)}
+.agerow input{width:84px;flex:none;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;font-size:17px;color:var(--text)}
 .setup h2{font-family:var(--display);font-weight:800;font-size:30px;text-transform:uppercase;margin:6px 0 2px;text-wrap:balance}
 .setup p{color:var(--muted);margin:0 0 6px;max-width:60ch}
 .picks{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -151,6 +153,10 @@ button{font:inherit;color:inherit;cursor:pointer}
       <h3 id="goaltitle"></h3>
       <ul id="goallist"></ul>
       <p id="effortkey"></p>
+      <p id="hrkey"></p>
+      <label class="agerow" for="age">Your age, to show heart rates in beats per minute
+        <input id="age" type="number" inputmode="numeric" min="10" max="90" placeholder="Age">
+      </label>
     </div>
     <h2>Pick your starting station</h2>
     <p id="pickhelp"></p>
@@ -224,6 +230,8 @@ button{font:inherit;color:inherit;cursor:pointer}
     main: "Borg 12 to 14: somewhat hard. You can still talk in sentences.",
     hard: "Borg 14 to 16: hard. Short sentences only."
   };
+  // rough heart rate bands to go with the Borg targets, as a percentage of maximum heart rate
+  var HR = { warm:[50,60], main:[65,80], hard:[80,90] };
   var CLASS_START = new Date(2026, 10, 22, 17, 0, 0);   // year, month (0 = January, so 10 = November), day, hour, minute, second
   var T = {
     lap: 60,        // warm-up lap: seconds on each station
@@ -308,20 +316,20 @@ button{font:inherit;color:inherit;cursor:pointer}
     }
     for(i=0;i<N;i++){
       var col = fade(BLUE, GREEN, N > 1 ? i/(N-1) : 1);
-      add({kind:"prep", lap:true, col:col, name:"Warm-up lap "+(i+1)+" of "+N, dur:lapDur, r:i, st:true, sub:EFFORT.warm+" Try the station and pick your level for the real lap."});
+      add({kind:"prep", zone:"warm", lap:true, col:col, name:"Warm-up lap "+(i+1)+" of "+N, dur:lapDur, r:i, st:true, sub:EFFORT.warm+" Try the station and pick your level for the real lap."});
       add({kind:"change", col:col, name:"Move on", dur:T.lapMove, r:(i+1)%N, st:true, sub: i===N-1 ? "Back to your starting station." : "Next station."});
     }
     add({kind:"prep", name:"Rest", dur:T.rest, r:0, st:true, sub:"Drink. Be at your starting station with your level picked."});
     for(i=0;i<N;i++){
       var sc = fade(GREEN, YELLOW, N > 1 ? i/(N-1) : 1);
-      add({kind:"station", col:sc, name:"Station "+(i+1)+" of "+N, dur:stDur, r:i, st:true, sub:EFFORT.main});
+      add({kind:"station", zone:"main", col:sc, name:"Station "+(i+1)+" of "+N, dur:stDur, r:i, st:true, sub:EFFORT.main});
       if(i<N-1) add({kind:"change", col:sc, name:"Change stations", dur:chDur, r:i+1, st:true, sub:"Move one station on and get going."});
     }
     add({kind:"prep", name:"Water", dur:waterDur, sub:"Then get onto a machine for the harder intervals.",
       cues:["Drink","One machine each: rowers, SkiErgs, Assault bikes, BikeErg or a curved treadmill. If they are all taken, share one and swap each interval, or use a sled.","Coming up: "+T.hardRounds+" intervals of "+mins(T.hardOn)+" strong, "+mins(offDur)+" easy"]});
     for(i=0;i<T.hardRounds;i++){
       var hc = fade(YELLOW, RED, T.hardRounds > 1 ? i/(T.hardRounds-1) : 1);
-      add({kind:"hard", col:hc, name:"Harder interval "+(i+1)+" of "+T.hardRounds, dur:T.hardOn, sub:EFFORT.hard+" Make every interval look the same."});
+      add({kind:"hard", zone:"hard", col:hc, name:"Harder interval "+(i+1)+" of "+T.hardRounds, dur:T.hardOn, sub:EFFORT.hard+" Make every interval look the same."});
       if(i < T.hardRounds-1) add({kind:"prep", name:"Recover", dur:offDur, sub:"Keep moving gently. Do not stop."});
     }
     add({kind:"prep", name:"Cool-down", dur:T.cool, sub:"Ease down gradually.",
@@ -340,6 +348,20 @@ button{font:inherit;color:inherit;cursor:pointer}
   build();
   if(S.start >= N) S.start = -1;
 
+  // each phone remembers its owner's age so the heart rate targets can be shown in beats per minute
+  var age = 0;
+  try{ age = parseInt(localStorage.getItem("circuit-age") || "0", 10) || 0; }catch(e){}
+  function hrRange(zone){
+    var r = HR[zone];
+    if(age >= 10 && age <= 90){
+      var max = 208 - 0.7*age, r5 = function(v){ return Math.round(v/5)*5; };
+      return r5(max*r[0]/100)+" to "+r5(max*r[1]/100)+" bpm";
+    }
+    return r[0]+" to "+r[1]+"% of your max";
+  }
+  function drawHr(){
+    $("hrkey").textContent = "Heart rate, rough guide. Warm-up "+hrRange("warm")+". Circuit "+hrRange("main")+". Intervals "+hrRange("hard")+".";
+  }
   function t(){ return S.running ? Math.min(total, S.base + (Date.now()-S.at)/1000) : S.base; }
   function indexAt(x){ var i = phases.length-1; while(i>0 && starts[i] > x) i--; return i; }
   function jump(x){ S.base = Math.max(0, Math.min(total, x)); S.at = Date.now(); lastSec = null; save(); }
@@ -480,7 +502,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     $("clock").className = "clock "+ph.kind;
     $("clock").style.borderTopColor = ph.col || "";
     $("phase").textContent = ph.name;
-    $("sub").textContent = ph.sub || "";
+    $("sub").textContent = (ph.sub || "") + (ph.zone ? " Heart rate about "+hrRange(ph.zone)+"." : "");
     drawMine(ph); drawStations(ph);
     $("cues").hidden = !ph.cues;
     if(ph.cues){
@@ -606,6 +628,13 @@ button{font:inherit;color:inherit;cursor:pointer}
   document.addEventListener("pointerdown", function(){ if(S.on){ audio(); if(S.running && !lock) wake(); } });
 
   $("date").textContent = SESSION_DATE;
+  if(age) $("age").value = age;
+  drawHr();
+  $("age").addEventListener("input", function(){
+    age = parseInt(this.value, 10) || 0;
+    try{ localStorage.setItem("circuit-age", String(age)); }catch(e){}
+    drawHr(); lastIdx = -1;
+  });
   $("goaltitle").textContent = GOAL_TITLE;
   GOALS.forEach(function(g){ $("goallist").appendChild(el("li","",g)); });
   $("effortkey").textContent = "Effort, Borg scale 6 to 20. Warm-up 8 to 10, light. Circuit 12 to 14, somewhat hard. Intervals 14 to 16, hard.";
