@@ -269,31 +269,31 @@ button{font:inherit;color:inherit;cursor:pointer}
   };
   // p = [work seconds, easy seconds] when a level is timed. on/off are the words shown.
   var ST = [
-    {kit:"Rower", cues:["Legs, then body, then arms", "Back flat, chest up", "Slow on the way forward"], how:"Long, smooth strokes.",
+    {kit:"Rower", cues:["Legs, then body, then arms", "Back flat, chest up", "Slow on the way forward"], how:"",
       lv:[{t:"30 sec on, 30 sec easy", p:[30,30]},{t:"45 sec on, 15 sec easy", p:[45,15]},{t:"Steady all the way"}]},
-    {kit:"Sled push", cues:["Lean in, arms locked", "Short, quick steps", "Hips low, back flat"], how:"Push a length, walk back, repeat.",
+    {kit:"Sled push", cues:["Lean in, arms locked", "Short, quick steps", "Hips low, back flat"], how:"",
       lv:[{t:"50 kg on the sled"},{t:"80 kg on the sled"},{t:"100 kg on the sled"}]},
-    {kit:"SkiErg", cues:["Reach tall, then hinge", "Arms long, hips back", "Soft knees"], how:"Hinge at the hips, hands finish by your pockets.",
+    {kit:"SkiErg", cues:["Reach tall, then hinge", "Arms long, hips back", "Soft knees"], how:"",
       lv:[{t:"30 sec on, 30 sec easy", p:[30,30]},{t:"45 sec on, 15 sec easy", p:[45,15]},{t:"Steady all the way"}]},
-    {kit:"Assault bike", cues:["Sit tall", "Push and pull the handles", "Even rhythm"], how:"Arms and legs together.",
+    {kit:"Assault bike", cues:["Sit tall", "Push and pull the handles", "Even rhythm"], how:"",
       lv:[{t:"40 sec on, 20 sec easy", p:[40,20]},{t:"50 sec on, 10 sec easy", p:[50,10]},{t:"Steady all the way"}]},
     {kit:"Curved treadmill", cues:["Short steps, land under your hips", "Stand tall, eyes up", "Step forward to speed up, back to slow"], how:"",
       lv:[{t:"Brisk walk all the way"},{t:"Jog, then walk for the last third", tailFrac:1/3, on:"Jog", off:"Walk"},{t:"Easy run all the way"}]},
-    {kit:"Battle ropes", cues:["Soft knees, chest up", "Small, fast waves", "Keep breathing"], how:"Waves, then march with arms in the air. Never let go of the ropes.",
+    {kit:"Battle ropes", cues:["Soft knees, chest up", "Small, fast waves", "Keep breathing"], how:"",
       lv:[{t:"20 sec ropes, 20 sec march", p:[20,20], on:"Ropes", off:"March"},{t:"30 sec ropes, 20 sec march", p:[30,20], on:"Ropes", off:"March"},{t:"40 sec ropes, 20 sec march", p:[40,20], on:"Ropes", off:"March"}]},
-    {kit:"HIIT machine: Farmers walk", cues:["Shoulders back and down", "Grip hard, arms long", "Short, steady steps"], how:"On the incline. Walk tall, holding the weighted handles.",
+    {kit:"HIIT machine: Farmers walk", cues:["Shoulders back and down", "Grip hard, arms long", "Short, steady steps"], how:"",
       two:"Two of you here: one on the machine, one does walking lunges. Swap halfway.",
       lv:[{t:"10 kg per handle"},{t:"20 kg per handle"},{t:"25 kg per handle"}]},
-    {kit:"BikeErg", cues:["Sit tall, light hands", "Smooth circles", "Knees in line with feet"], how:"Hold the cadence shown on the bike's screen.",
+    {kit:"BikeErg", cues:["Sit tall, light hands", "Smooth circles", "Knees in line with feet"], how:"",
       two:"Two of you here: one on the BikeErg, one on the spare curved treadmill. Swap halfway.",
       lv:[{t:"About 70 rpm"},{t:"About 80 rpm"},{t:"About 90 rpm"}]}
   ];
   // attendance: 8 or fewer people still do all 8 stations.
   // 9 adds the sled pull and 10 adds bodyweight. From 11 people up, stations are shared two at a time:
   // 8 stations up to 16 people, 9 for 17 and 18, 10 for 19 and 20.
-  var PULL = {kit:"Sled pull", cues:["Stay low, chest up", "Brace your middle", "Steady pulls, no jerking"], how:"Pull a length, walk back, repeat.",
+  var PULL = {kit:"Sled pull", cues:["Stay low, chest up", "Brace your middle", "Steady pulls, no jerking"], how:"",
       lv:[{t:"40 kg on the sled"},{t:"60 kg on the sled"},{t:"80 kg on the sled"}]};
-  var BW = {kit:"Bodyweight", cues:["Heels down, knees out", "Chest up", "Land softly"], how:"Steady rhythm. Keep moving for the whole station.",
+  var BW = {kit:"Bodyweight", cues:["Heels down, knees out", "Chest up", "Land softly"], how:"",
       lv:[{t:"Squats"},{t:"Lunges, alternating legs"},{t:"Burpees. Add a push-up to make it harder."}]};
   var MIN_PEOPLE = 8, MAX_PEOPLE = 20;   // 8 or fewer people still do all 8 stations
   function shared(n){ return n > 10; }
@@ -483,7 +483,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     var left = el("div","left",""); left.id = "cardleft"; head.appendChild(left);
     box.appendChild(head);
     box.appendChild(el("div","kit",st.kit));
-    box.appendChild(el("div","how",st.how + (st.two && shared(S.count) ? " " + st.two : "")));
+    box.appendChild(el("div","how",(st.how + (st.two && shared(S.count) ? " " + st.two : "")).trim()));
     if(st.cues && ph.lap){ var ul = el("ul","tips"); st.cues.forEach(function(c){ ul.appendChild(el("li","",c)); }); box.appendChild(ul); }
     if(ph.lapMove) return;   // moving between warm-up stations: just say where to go
     var lv = el("div","levels");
@@ -520,7 +520,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       var d = el("div","st");
       d.appendChild(el("div","n","STATION "+(i+1)));
       d.appendChild(el("div","kit",s.kit));
-      d.appendChild(el("div","how",s.how + (s.two && shared(S.count) ? " " + s.two : "")));
+      d.appendChild(el("div","how",(s.how + (s.two && shared(S.count) ? " " + s.two : "")).trim()));
       if(s.cues) d.appendChild(el("div","tipline",s.cues.join(" · ")));
       s.lv.forEach(function(lv, l){
         var row = el("div","lvrow");
