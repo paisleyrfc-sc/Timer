@@ -223,13 +223,13 @@ button{font:inherit;color:inherit;cursor:pointer}
     "Training: your heart and muscles to deliver and use more oxygen, and to clear lactate faster.",
     "For rugby: recover faster between sprints, tackles and rucks, and keep your work rate and skills in the last 20 minutes."
   ];
-  // effort on the Borg scale, 6 (nothing) to 20 (flat out)
+  // effort by the talk test
   var EFFORT = {
-    warm: "Borg 8 to 10: very light to light.",
-    main: "Borg 12 to 14: somewhat hard. You can still talk in sentences.",
-    hard: "Borg 14 to 16: hard. Short sentences only."
+    warm: "You can talk easily.",
+    main: "Starting to struggle with full sentences.",
+    hard: "No more than a few words."
   };
-  // rough heart rate bands to go with the Borg targets, as a percentage of maximum heart rate
+  // rough heart rate bands to go with the effort targets, as a percentage of maximum heart rate
   var HR = { warm:[50,60], main:[65,80], hard:[80,90] };
   var CLASS_START = new Date(2026, 10, 22, 17, 0, 0);   // year, month (0 = January, so 10 = November), day, hour, minute, second
   var T = {
@@ -636,7 +636,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   });
   $("goaltitle").textContent = GOAL_TITLE;
   GOALS.forEach(function(g){ $("goallist").appendChild(el("li","",g)); });
-  $("effortkey").textContent = "Effort, Borg scale 6 to 20. Warm-up 8 to 10, light. Circuit 12 to 14, somewhat hard. Intervals 14 to 16, hard.";
+  $("effortkey").textContent = "Effort guide. Warm-up: talk easily. Circuit: starting to struggle with sentences. Intervals: only a few words.";
   drawBar(); show(); setGo();
   requestAnimationFrame(frame);
 
