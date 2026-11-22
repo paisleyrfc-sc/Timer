@@ -37,6 +37,10 @@ button{font:inherit;color:inherit;cursor:pointer}
 .until{background:var(--panel);border:1px solid var(--line);border-left:8px solid var(--move);border-radius:0;padding:10px 16px;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px}
 .until span{color:var(--muted);font-weight:600}
 .until b{font-family:var(--display);font-weight:800;font-size:40px;font-variant-numeric:tabular-nums;line-height:1}
+.goals{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:8px}
+.goals h3{font-family:var(--display);font-weight:800;font-size:22px;text-transform:uppercase;margin:0 0 6px;text-wrap:balance}
+.goals ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:4px;font-size:15.5px}
+.setup .goals p{margin:8px 0 0;font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:8px}
 .setup h2{font-family:var(--display);font-weight:800;font-size:30px;text-transform:uppercase;margin:6px 0 2px;text-wrap:balance}
 .setup p{color:var(--muted);margin:0 0 6px;max-width:60ch}
 .picks{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -143,6 +147,11 @@ button{font:inherit;color:inherit;cursor:pointer}
   <!-- SETUP -->
   <section class="setup" id="setup">
     <div class="until" id="until" hidden><span id="untillab">Class starts in</span><b id="untilnum"></b></div>
+    <div class="goals">
+      <h3 id="goaltitle"></h3>
+      <ul id="goallist"></ul>
+      <p id="effortkey"></p>
+    </div>
     <h2>Pick your starting station</h2>
     <p id="pickhelp"></p>
     <div class="howmany">
@@ -202,6 +211,19 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   /* ---------- THE SESSION: edit here ---------- */
   var SESSION_DATE = "Sunday 22nd November";   // shown under the title
+  // shown on the home screen
+  var GOAL_TITLE = "Today's goal: a bigger aerobic engine";
+  var GOALS = [
+    "Training: your heart and muscles to deliver and use more oxygen, and to clear lactate faster.",
+    "Over the coming weeks: a stronger heart, more capillaries and mitochondria in the working muscles, quicker recovery.",
+    "For rugby: recover faster between sprints, tackles and rucks, and keep your work rate and skills in the last 20 minutes."
+  ];
+  // effort on the Borg scale, 6 (nothing) to 20 (flat out)
+  var EFFORT = {
+    warm: "Borg 10: light.",
+    main: "Borg 13 to 14: somewhat hard. You can talk in short sentences.",
+    hard: "Borg 16 to 18: very hard. A few words at a time."
+  };
   var CLASS_START = new Date(2026, 10, 22, 17, 0, 0);   // year, month (0 = January, so 10 = November), day, hour, minute, second
   var T = {
     lap: 60,        // warm-up lap: seconds on each station
@@ -286,20 +308,20 @@ button{font:inherit;color:inherit;cursor:pointer}
     }
     for(i=0;i<N;i++){
       var col = fade(BLUE, GREEN, N > 1 ? i/(N-1) : 1);
-      add({kind:"prep", lap:true, col:col, name:"Warm-up lap "+(i+1)+" of "+N, dur:lapDur, r:i, st:true, sub:"Easy pace. Try the station and pick your level for the real lap."});
+      add({kind:"prep", lap:true, col:col, name:"Warm-up lap "+(i+1)+" of "+N, dur:lapDur, r:i, st:true, sub:EFFORT.warm+" Try the station and pick your level for the real lap."});
       add({kind:"change", col:col, name:"Move on", dur:T.lapMove, r:(i+1)%N, st:true, sub: i===N-1 ? "Back to your starting station." : "Next station."});
     }
     add({kind:"prep", name:"Rest", dur:T.rest, r:0, st:true, sub:"Drink. Be at your starting station with your level picked."});
     for(i=0;i<N;i++){
       var sc = fade(GREEN, YELLOW, N > 1 ? i/(N-1) : 1);
-      add({kind:"station", col:sc, name:"Station "+(i+1)+" of "+N, dur:stDur, r:i, st:true, sub:"Effort 4 to 5 out of 10. You can still talk in sentences."});
+      add({kind:"station", col:sc, name:"Station "+(i+1)+" of "+N, dur:stDur, r:i, st:true, sub:EFFORT.main});
       if(i<N-1) add({kind:"change", col:sc, name:"Change stations", dur:chDur, r:i+1, st:true, sub:"Move one station on and get going."});
     }
     add({kind:"prep", name:"Water", dur:waterDur, sub:"Then get onto a machine for the harder intervals.",
       cues:["Drink","One machine each: rowers, SkiErgs, Assault bikes, BikeErg or a curved treadmill. If they are all taken, share one and swap each interval, or use a sled.","Coming up: "+T.hardRounds+" intervals of "+mins(T.hardOn)+" strong, "+mins(offDur)+" easy"]});
     for(i=0;i<T.hardRounds;i++){
       var hc = fade(YELLOW, RED, T.hardRounds > 1 ? i/(T.hardRounds-1) : 1);
-      add({kind:"hard", col:hc, name:"Harder interval "+(i+1)+" of "+T.hardRounds, dur:T.hardOn, sub:"Strong, even pace. About 7 out of 10. Make every interval look the same."});
+      add({kind:"hard", col:hc, name:"Harder interval "+(i+1)+" of "+T.hardRounds, dur:T.hardOn, sub:EFFORT.hard+" Make every interval look the same."});
       if(i < T.hardRounds-1) add({kind:"prep", name:"Recover", dur:offDur, sub:"Keep moving gently. Do not stop."});
     }
     add({kind:"prep", name:"Cool-down", dur:T.cool, sub:"Ease down gradually.",
@@ -584,6 +606,9 @@ button{font:inherit;color:inherit;cursor:pointer}
   document.addEventListener("pointerdown", function(){ if(S.on){ audio(); if(S.running && !lock) wake(); } });
 
   $("date").textContent = SESSION_DATE;
+  $("goaltitle").textContent = GOAL_TITLE;
+  GOALS.forEach(function(g){ $("goallist").appendChild(el("li","",g)); });
+  $("effortkey").textContent = "Effort, Borg scale 6 to 20. Warm-up 10, light. Circuit 13 to 14, somewhat hard. Intervals 16 to 18, very hard.";
   drawBar(); show(); setGo();
   requestAnimationFrame(frame);
 
