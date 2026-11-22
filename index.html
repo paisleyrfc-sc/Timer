@@ -99,6 +99,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* my station */
 .mine{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 18px;display:flex;flex-direction:column;gap:6px}
 .mine .lab{color:var(--muted);font-weight:600;letter-spacing:.1em;font-size:13px;text-transform:uppercase}
+.how:empty{display:none}
 .mine .cardhead{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .mine .left{font-family:var(--display);font-weight:800;font-size:40px;line-height:1;font-variant-numeric:tabular-nums}
 .mine .kit{font-family:var(--display);font-weight:800;font-size:clamp(32px,9vw,52px);line-height:1;text-transform:uppercase;color:var(--move)}
@@ -276,7 +277,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       lv:[{t:"30 sec on, 30 sec easy", p:[30,30]},{t:"45 sec on, 15 sec easy", p:[45,15]},{t:"Steady all the way"}]},
     {kit:"Assault bike", cues:["Sit tall", "Push and pull the handles", "Even rhythm"], how:"Arms and legs together.",
       lv:[{t:"40 sec on, 20 sec easy", p:[40,20]},{t:"50 sec on, 10 sec easy", p:[50,10]},{t:"Steady all the way"}]},
-    {kit:"Curved treadmill", cues:["Short steps, land under your hips", "Stand tall, eyes up", "Step forward to speed up, back to slow"], how:"Stay in the middle of the belt.",
+    {kit:"Curved treadmill", cues:["Short steps, land under your hips", "Stand tall, eyes up", "Step forward to speed up, back to slow"], how:"",
       lv:[{t:"Brisk walk all the way"},{t:"Jog, then walk for the last third", tailFrac:1/3, on:"Jog", off:"Walk"},{t:"Easy run all the way"}]},
     {kit:"Battle ropes", cues:["Soft knees, chest up", "Small, fast waves", "Keep breathing"], how:"Waves, then march with arms in the air. Never let go of the ropes.",
       lv:[{t:"20 sec ropes, 20 sec march", p:[20,20], on:"Ropes", off:"March"},{t:"30 sec ropes, 20 sec march", p:[30,20], on:"Ropes", off:"March"},{t:"40 sec ropes, 20 sec march", p:[40,20], on:"Ropes", off:"March"}]},
