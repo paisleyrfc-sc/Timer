@@ -96,7 +96,12 @@ button{font:inherit;color:inherit;cursor:pointer}
 .levels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
 .levels button{background:transparent;border:2px solid var(--line);border-radius:12px;padding:10px 4px;font-family:var(--display);font-weight:800;font-size:22px}
 .levels button[aria-pressed="true"]{border-color:var(--text);background:var(--text);color:var(--bg)}
-.mine .task{font-size:21px;font-weight:600}
+.mine .doing{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:18px 14px;margin-top:6px;text-align:center;display:flex;flex-direction:column;gap:10px}
+.mine .task{font-size:25px;font-weight:600;line-height:1.25;text-wrap:balance}
+.mine .state:empty{display:none}
+.mine .effort{text-align:center;display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.mine .effort b{font-weight:600;font-size:18px}
+.mine .effort span{color:var(--muted);font-size:15px}
 .mine .state{font-family:var(--display);font-weight:800;font-size:clamp(44px,13vw,72px);line-height:1;text-transform:uppercase;font-variant-numeric:tabular-nums}
 .mine .state.go{color:var(--work)}
 .mine .state.off{color:var(--easy)}
@@ -315,20 +320,20 @@ button{font:inherit;color:inherit;cursor:pointer}
     }
     for(i=0;i<N;i++){
       var col = fade(BLUE, GREEN, N > 1 ? i/(N-1) : 1);
-      add({kind:"prep", zone:"warm", lap:true, col:col, name:"Warm-up lap "+(i+1)+" of "+N, dur:lapDur, r:i, st:true, sub:EFFORT.warm+" Try the station and pick your level for the real lap."});
+      add({kind:"prep", zone:"warm", lap:true, col:col, name:"Warm-up lap "+(i+1)+" of "+N, dur:lapDur, r:i, st:true, note:"Try the station and pick your level for the real lap."});
       add({kind:"change", col:col, name:"Move on", dur:T.lapMove, r:(i+1)%N, st:true, sub: i===N-1 ? "Back to your starting station." : "Next station."});
     }
     add({kind:"prep", name:"Rest", dur:T.rest, r:0, st:true, sub:"Drink. Be at your starting station with your level picked."});
     for(i=0;i<N;i++){
       var sc = fade(GREEN, YELLOW, N > 1 ? i/(N-1) : 1);
-      add({kind:"station", zone:"main", col:sc, name:"Station "+(i+1)+" of "+N, dur:stDur, r:i, st:true, sub:EFFORT.main});
+      add({kind:"station", zone:"main", col:sc, name:"Station "+(i+1)+" of "+N, dur:stDur, r:i, st:true, note:""});
       if(i<N-1) add({kind:"change", col:sc, name:"Change stations", dur:chDur, r:i+1, st:true, sub:"Move one station on and get going."});
     }
     add({kind:"prep", name:"Water", dur:waterDur, sub:"Then get onto a machine for the harder intervals.",
       cues:["Drink","One machine each: rowers, SkiErgs, Assault bikes, BikeErg or a curved treadmill. If they are all taken, share one and swap each interval, or use a sled.","Coming up: "+T.hardRounds+" intervals of "+mins(T.hardOn)+" strong, "+mins(offDur)+" easy"]});
     for(i=0;i<T.hardRounds;i++){
       var hc = fade(YELLOW, RED, T.hardRounds > 1 ? i/(T.hardRounds-1) : 1);
-      add({kind:"hard", zone:"hard", col:hc, name:"Harder interval "+(i+1)+" of "+T.hardRounds, dur:T.hardOn, sub:EFFORT.hard+" Make every interval look the same."});
+      add({kind:"hard", zone:"hard", col:hc, name:"Harder interval "+(i+1)+" of "+T.hardRounds, dur:T.hardOn, note:"Make every interval look the same."});
       if(i < T.hardRounds-1) add({kind:"prep", name:"Recover", dur:offDur, sub:"Keep moving gently. Do not stop."});
     }
     add({kind:"prep", name:"Cool-down", dur:T.cool, sub:"Ease down gradually.",
@@ -456,7 +461,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     box.appendChild(el("div","lab",(ph.kind === "change" ? "Move to station " : "You are on station ")+(s+1)));
     box.appendChild(el("div","kit",st.kit));
     box.appendChild(el("div","how",st.how + (st.two && shared(S.count) ? " " + st.two : "")));
-    if(st.cues){ var ul = el("ul","tips"); st.cues.forEach(function(c){ ul.appendChild(el("li","",c)); }); box.appendChild(ul); }
+    if(st.cues && ph.lap){ var ul = el("ul","tips"); st.cues.forEach(function(c){ ul.appendChild(el("li","",c)); }); box.appendChild(ul); }
     var lv = el("div","levels");
     [0,1,2].forEach(function(l){
       var b = el("button","","Level "+(l+1));
@@ -465,13 +470,15 @@ button{font:inherit;color:inherit;cursor:pointer}
       lv.appendChild(b);
     });
     box.appendChild(lv);
-    box.appendChild(el("div","task",st.lv[S.level].t));
-    var state = el("div","state",""); state.id = "state"; box.appendChild(state);
-    var nx = phases[lastIdx+1];
-    if(ph.kind !== "change"){
-      var then = el("div","then","Then: ");
-      then.appendChild(el("b","", nx && nx.st ? ACT[myStation(nx)].kit : nx ? nx.name : "Finished"));
-      box.appendChild(then);
+    var doing = el("div","doing");
+    doing.appendChild(el("div","task",st.lv[S.level].t));
+    var state = el("div","state",""); state.id = "state"; doing.appendChild(state);
+    box.appendChild(doing);
+    if(ph.zone){
+      var eff = el("div","effort");
+      eff.appendChild(el("b","",EFFORT[ph.zone]));
+      eff.appendChild(el("span","","Heart rate about "+hrRange(ph.zone)));
+      box.appendChild(eff);
     }
   }
 
@@ -501,7 +508,8 @@ button{font:inherit;color:inherit;cursor:pointer}
     $("clock").className = "clock "+ph.kind;
     $("clock").style.borderTopColor = ph.col || "";
     $("phase").textContent = ph.name;
-    $("sub").textContent = (ph.sub || "") + (ph.zone ? " Heart rate about "+hrRange(ph.zone)+"." : "");
+    var onCard = !S.coach && ph.st && ph.zone;   // effort and heart rate sit on the station card when there is one
+    $("sub").textContent = ph.zone ? (onCard ? ph.note : EFFORT[ph.zone]+" Heart rate about "+hrRange(ph.zone)+". "+ph.note) : (ph.sub || "");
     drawMine(ph); drawStations(ph);
     $("cues").hidden = !ph.cues;
     if(ph.cues){
@@ -513,8 +521,11 @@ button{font:inherit;color:inherit;cursor:pointer}
       segs[i].classList.toggle("now", i === lastIdx);
       segs[i].classList.toggle("done", i < lastIdx);
     }
-    var nx = phases[lastIdx+1];
-    $("next").textContent = nx ? nx.name+" ("+mins(nx.dur)+")" : "Finished";
+    // "Next" names what is coming, skipping over the changeovers
+    var j = lastIdx+1;
+    while(phases[j] && phases[j].kind === "change") j++;
+    var nx = phases[j];
+    $("next").textContent = !nx ? "Finished" : (!S.coach && nx.st && nx.zone ? ACT[myStation(nx)].kit : nx.name)+" ("+mins(nx.dur)+")";
   }
 
   function setGo(){
@@ -578,7 +589,7 @@ button{font:inherit;color:inherit;cursor:pointer}
             se.className = "state "+(m.work ? "go" : "off");
             if(S.running && lastWork !== null && lastWork !== m.work){ tone(990,0.08); tone(990,0.08,0.14); }
             lastWork = m.work;
-          } else if(se){ se.textContent = "Keep going"; se.className = "state go"; }
+          } else if(se){ se.textContent = ""; }
         }
       }
     }
