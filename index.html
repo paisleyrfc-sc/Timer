@@ -255,7 +255,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   // p = [work seconds, easy seconds] when a level is timed. on/off are the words shown.
   var ST = [
     {kit:"Rower", cues:["Legs, then body, then arms", "Back flat, chest up", "Slow on the way forward"], how:"Long, smooth strokes.",
-      lv:[{t:"Steady, then easy for the last third", tailFrac:1/3},{t:"Steady, then easy for the last 30 sec", tail:30},{t:"Steady all the way"}]},
+      lv:[{t:"30 sec on, 30 sec easy", p:[30,30]},{t:"45 sec on, 15 sec easy", p:[45,15]},{t:"Steady all the way"}]},
     {kit:"Sled push", cues:["Lean in, arms locked", "Short, quick steps", "Hips low, back flat"], how:"Push a length, walk back, repeat.",
       lv:[{t:"50 kg on the sled"},{t:"80 kg on the sled"},{t:"100 kg on the sled"}]},
     {kit:"SkiErg", cues:["Reach tall, then hinge", "Arms long, hips back", "Soft knees"], how:"Hinge at the hips, hands finish by your pockets.",
@@ -326,7 +326,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     for(i=0;i<N;i++){
       var col = fade(BLUE, GREEN, N > 1 ? i/(N-1) : 1);
       add({kind:"prep", zone:"warm", lap:true, col:col, name:"Warm-up lap "+(i+1)+" of "+N, dur:lapDur, r:i, st:true, note:"Try the station and pick your level for the real lap."});
-      add({kind:"change", col:col, name:"Move on", dur:T.lapMove, r:(i+1)%N, st:true, sub: i===N-1 ? "Back to your starting station." : "Next station."});
+      add({kind:"change", lapMove:true, col:col, name:"Move on", dur:T.lapMove, r:(i+1)%N, st:true, sub: i===N-1 ? "Back to your starting station." : "Next station."});
     }
     add({kind:"prep", name:"Rest", dur:T.rest, r:0, st:true, sub:"Drink. Be at your starting station with your level picked."});
     for(i=0;i<N;i++){
@@ -467,6 +467,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     box.appendChild(el("div","kit",st.kit));
     box.appendChild(el("div","how",st.how + (st.two && shared(S.count) ? " " + st.two : "")));
     if(st.cues && ph.lap){ var ul = el("ul","tips"); st.cues.forEach(function(c){ ul.appendChild(el("li","",c)); }); box.appendChild(ul); }
+    if(ph.lapMove) return;   // moving between warm-up stations: just say where to go
     var lv = el("div","levels");
     [0,1,2].forEach(function(l){
       var b = el("button","","Level "+(l+1));
