@@ -222,7 +222,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   var EFFORT = {
     warm: "Borg 8 to 10: very light to light.",
     main: "Borg 12 to 14: somewhat hard. You can still talk in sentences.",
-    hard: "Borg 16 to 18: very hard. A few words at a time."
+    hard: "Borg 14 to 16: hard. Short sentences only."
   };
   var CLASS_START = new Date(2026, 10, 22, 17, 0, 0);   // year, month (0 = January, so 10 = November), day, hour, minute, second
   var T = {
@@ -608,7 +608,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   $("date").textContent = SESSION_DATE;
   $("goaltitle").textContent = GOAL_TITLE;
   GOALS.forEach(function(g){ $("goallist").appendChild(el("li","",g)); });
-  $("effortkey").textContent = "Effort, Borg scale 6 to 20. Warm-up 8 to 10, light. Circuit 12 to 14, somewhat hard. Intervals 16 to 18, very hard.";
+  $("effortkey").textContent = "Effort, Borg scale 6 to 20. Warm-up 8 to 10, light. Circuit 12 to 14, somewhat hard. Intervals 14 to 16, hard.";
   drawBar(); show(); setGo();
   requestAnimationFrame(frame);
 
