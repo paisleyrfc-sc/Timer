@@ -34,6 +34,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .chip[aria-pressed="true"]{border-color:var(--easy);color:var(--easy)}
 
 /* setup */
+.until{background:var(--panel);border:1px solid var(--line);border-left:8px solid var(--move);border-radius:0;padding:10px 16px;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.until span{color:var(--muted);font-weight:600}
+.until b{font-family:var(--display);font-weight:800;font-size:40px;font-variant-numeric:tabular-nums;line-height:1}
 .setup h2{font-family:var(--display);font-weight:800;font-size:30px;text-transform:uppercase;margin:6px 0 2px;text-wrap:balance}
 .setup p{color:var(--muted);margin:0 0 6px;max-width:60ch}
 .picks{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -139,6 +142,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   <!-- SETUP -->
   <section class="setup" id="setup">
+    <div class="until" id="until" hidden><span id="untillab">Class starts in</span><b id="untilnum"></b></div>
     <h2>Pick your starting station</h2>
     <p id="pickhelp"></p>
     <div class="howmany">
@@ -198,6 +202,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   /* ---------- THE SESSION: edit here ---------- */
   var SESSION_DATE = "Sunday 22nd November";   // shown under the title
+  var CLASS_START = new Date(2026, 10, 22, 17, 0, 0);   // year, month (0 = January, so 10 = November), day, hour, minute, second
   var T = {
     lap: 60,        // warm-up lap: seconds on each station
     lapMove: 15,    // warm-up lap: seconds to move
@@ -475,7 +480,22 @@ button{font:inherit;color:inherit;cursor:pointer}
     b.classList.toggle("paused", !S.running);
   }
 
+  var lastUntil = "";
+  function drawUntil(){
+    var left = Math.ceil((CLASS_START.getTime() - Date.now())/1000), box = $("until"), txt;
+    if(left > 0){
+      var h = Math.floor(left/3600), m = Math.floor(left%3600/60), x = left%60;
+      txt = (h > 0 ? h+":"+(m<10?"0":"") : "")+m+":"+(x<10?"0":"")+x;
+    } else if(left > -3*3600){ txt = "now"; } else { txt = ""; }
+    if(txt === lastUntil) return;
+    lastUntil = txt;
+    box.hidden = !txt;
+    $("untillab").textContent = txt === "now" ? "Class time. Start on the coach's go." : "Class starts in";
+    $("untilnum").textContent = txt === "now" ? "" : txt;
+  }
+
   function frame(){
+    if(!S.on || home) drawUntil();
     if(S.on){
       var x = t();
       if(S.running && x >= total){ S.running = false; S.base = total; save(); longBeep(); setGo(); }
