@@ -1,6 +1,6 @@
 // Keeps the circuit timer available with no signal after it has been opened once.
 // Change the version name when you upload a new index.html.
-var CACHE = "circuit-timer-v19";
+var CACHE = "circuit-timer-v20";
 
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(["./"]); }).catch(function () {}));
