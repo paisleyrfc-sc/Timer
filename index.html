@@ -54,8 +54,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .pickbtn.wide{grid-column:1/-1;min-height:0}
 .big{background:var(--work);border:0;border-radius:16px;color:#1b1206;font-family:var(--display);font-weight:800;font-size:38px;letter-spacing:.06em;text-transform:uppercase;padding:18px;width:100%}
 .big:disabled{background:var(--line);color:var(--muted);cursor:not-allowed}
-.howmany{display:flex;align-items:center;gap:12px;margin:10px 0 4px}
-.howmany span{color:var(--muted);margin-right:auto}
+.howmany{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;margin:10px 0 4px}
+.howmany span{color:var(--muted);flex-basis:100%}
 .howmany b{font-family:var(--display);font-weight:800;font-size:28px;white-space:nowrap;min-width:1.2em;text-align:center}
 .howmany .btn{min-width:64px;font-size:19px}
 .howmany .btn:disabled{opacity:.35;cursor:not-allowed}
@@ -174,11 +174,11 @@ button{font:inherit;color:inherit;cursor:pointer}
     <p style="margin-top:14px">The session, <span id="plantotal"></span>:</p>
     <ol class="plan">
       <li id="planlap"></li>
-      <li>Rest: 2 minutes</li>
+      <li>Rest: 2 min</li>
       <li id="planmain"></li>
       <li id="planwater"></li>
       <li id="planhard"></li>
-      <li>Cool-down: 3 minutes</li>
+      <li>Cool-down: 3 min</li>
     </ol>
   </section>
 
