@@ -50,6 +50,18 @@ button{font:inherit;color:inherit;cursor:pointer}
 .goals h3{font-family:var(--display);font-weight:800;font-size:22px;text-transform:uppercase;margin:0 0 6px;text-wrap:balance}
 .goals ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:4px;font-size:15.5px}
 .setup .goals p{margin:8px 0 0;font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:8px}
+.namerow{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:16px;font-weight:600;margin:4px 0}
+.namerow input{flex:1;min-width:0;max-width:240px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font:inherit;font-weight:400;font-size:16px;color:var(--text)}
+.pickbtn{min-height:62px!important;padding:10px 12px!important}
+.finish{background:var(--panel);border:1px solid var(--line);border-top:8px solid var(--go);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.finish h2{font-family:var(--display);font-weight:800;font-size:34px;text-transform:uppercase;margin:0;line-height:1.05;text-wrap:balance}
+.finish dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:6px 16px;font-size:18px}
+.finish dt{color:var(--muted)}
+.finish dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.finish .total dt,.finish .total dd{color:var(--text);font-size:22px;border-top:1px solid var(--line);padding-top:8px}
+.finish .lv{color:var(--muted);font-size:15px}
+.finish a.btn,.finish button.btn{display:block;text-align:center;text-decoration:none;color:var(--text);line-height:28px}
+.finish a.btn{background:var(--go);border-color:var(--go);color:#06200f}
 .agerow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;font-size:14px;color:var(--muted)}
 .agerow input{width:84px;flex:none;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;font-size:17px;color:var(--text)}
 .setup h2{font-family:var(--display);font-weight:800;font-size:30px;text-transform:uppercase;margin:6px 0 2px;text-wrap:balance}
@@ -172,38 +184,53 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   <!-- SETUP -->
   <section class="setup" id="setup">
-    <div class="until" id="until" hidden><span id="untillab">Class starts in</span><b id="untilnum"></b></div>
-    <div class="goals">
-      <h3 id="goaltitle"></h3>
-      <ul id="goallist"></ul>
-      <label class="agerow" for="age">Your age, to show heart rates in beats per minute
-        <input id="age" type="number" inputmode="numeric" min="10" max="90" placeholder="Age">
+    <!-- step 1: today's session and your details -->
+    <div id="step1">
+      <div class="until" id="until" hidden><span id="untillab">Class starts in</span><b id="untilnum"></b></div>
+      <div class="goals">
+        <h3 id="goaltitle"></h3>
+        <ul id="goallist"></ul>
+      </div>
+      <div class="howmany">
+        <span>How many today?</span>
+        <button class="btn" id="less" aria-label="One fewer person">−1</button>
+        <b id="howmany">8</b>
+        <button class="btn" id="more" aria-label="One more person">+1</button>
+      </div>
+      <p id="countnote"></p>
+      <p style="margin-top:14px">The session, <span id="plantotal"></span>:</p>
+      <ol class="plan">
+        <li id="planlap"></li>
+        <li>Rest: 2 min</li>
+        <li id="planmain"></li>
+        <li id="planwater"></li>
+        <li id="planhard"></li>
+        <li>Cool-down: 3 min</li>
+      </ol>
+      <label class="namerow" for="name" style="margin-top:14px">Your name
+        <input id="name" type="text" maxlength="30" autocomplete="given-name" placeholder="For your result at the end">
       </label>
-      <p id="effortkey"></p>
-      <p id="hrkey"></p>
+      <div class="goals" style="margin-top:10px">
+        <label class="agerow" for="age" style="margin-top:0">Your age, to show heart rates in beats per minute
+          <input id="age" type="number" inputmode="numeric" min="10" max="90" placeholder="Age">
+        </label>
+        <p id="effortkey"></p>
+        <p id="hrkey"></p>
+      </div>
+      <button class="big" id="tostep2" style="margin-top:14px">Next</button>
     </div>
-    <h2>Pick your starting station</h2>
-    <p id="pickhelp"></p>
-    <div class="howmany">
-      <span>How many today?</span>
-      <button class="btn" id="less" aria-label="One fewer person">−1</button>
-      <b id="howmany">8</b>
-      <button class="btn" id="more" aria-label="One more person">+1</button>
+    <!-- step 2: pick a station and start -->
+    <div id="step2" hidden>
+      <h2>Pick your starting station</h2>
+      <p id="pickhelp"></p>
+      <div class="picks" id="picks"></div>
+      <p style="margin-top:14px"></p>
+      <button class="big" id="start" disabled>Pick a station</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+        <button class="btn" id="tostep1">Back</button>
+        <button class="btn" id="reset">Reset</button>
+      </div>
     </div>
-    <p id="countnote"></p>
-    <div class="picks" id="picks"></div>
-    <p style="margin-top:14px"></p>
-    <button class="big" id="start" disabled>Pick a station</button>
-    <button class="btn" id="reset" style="width:100%;margin-top:10px">Reset</button>
-    <p style="margin-top:14px">The session, <span id="plantotal"></span>:</p>
-    <ol class="plan">
-      <li id="planlap"></li>
-      <li>Rest: 2 min</li>
-      <li id="planmain"></li>
-      <li id="planwater"></li>
-      <li id="planhard"></li>
-      <li>Cool-down: 3 min</li>
-    </ol>
   </section>
 
   <!-- RUNNING -->
@@ -223,6 +250,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       <div class="next">Next: <b id="next"></b></div>
     </div>
 
+    <div class="finish" id="finish" hidden></div>
     <div class="cues" id="cues" hidden><ol id="cuelist"></ol></div>
     <div class="stations" id="stations" hidden></div>
 
@@ -282,10 +310,8 @@ button{font:inherit;color:inherit;cursor:pointer}
     {kit:"Battle ropes", cues:["Soft knees, chest up", "Small, fast waves", "Keep breathing"], how:"",
       lv:[{t:"20 sec ropes, 20 sec march", p:[20,20], on:"Ropes", off:"March"},{t:"30 sec ropes, 20 sec march", p:[30,20], on:"Ropes", off:"March"},{t:"40 sec ropes, 20 sec march", p:[40,20], on:"Ropes", off:"March"}]},
     {kit:"HIIT machine: Farmers walk", cues:["Shoulders back and down", "Grip hard, arms long", "Short, steady steps"], how:"",
-      two:"Two of you here: one on the machine, one does walking lunges. Swap halfway.",
       lv:[{t:"10 kg per handle"},{t:"20 kg per handle"},{t:"25 kg per handle"}]},
     {kit:"BikeErg", cues:["Sit tall, light hands", "Smooth circles", "Knees in line with feet"], how:"",
-      two:"Two of you here: one on the BikeErg, one on the spare curved treadmill. Swap halfway.",
       lv:[{t:"About 70 rpm"},{t:"About 80 rpm"},{t:"About 90 rpm"}]}
   ];
   // attendance: 8 or fewer people still do all 8 stations.
@@ -297,9 +323,21 @@ button{font:inherit;color:inherit;cursor:pointer}
       lv:[{t:"Squats"},{t:"Lunges, alternating legs"},{t:"Burpees. Add a push-up to make it harder."}]};
   var MIN_PEOPLE = 8, MAX_PEOPLE = 20;   // 8 or fewer people still do all 8 stations
   function shared(n){ return n > 10; }
-  function stationCount(n){ return n <= 8 ? 8 : n <= 10 ? n : n <= 16 ? 8 : n <= 18 ? 9 : 10; }
+  // In a shared session the HIIT machine and BikeErg are one station: one person on each, swap halfway.
+  var PAIR = {kit:"HIIT machine + BikeErg", how:"", two:"One of you on each machine. Swap at halfway.",
+      cues:["Swap machines when the clock shows half","Farmers walk: shoulders back, grip hard","BikeErg: sit tall, smooth circles"],
+      lv:[{t:"10 kg per handle / about 70 rpm"},{t:"20 kg per handle / about 80 rpm"},{t:"25 kg per handle / about 90 rpm"}]};
+  // one each up to 10 people. Shared: 7 stations up to 14 people, 8 up to 16, 9 from 17.
+  function stationCount(n){ return n <= 8 ? 8 : n <= 10 ? n : n <= 14 ? 7 : n <= 16 ? 8 : 9; }
   function stationsFor(n){
-    var k = stationCount(n), a = ST.slice(0, Math.min(k, 8));
+    var k = stationCount(n), a;
+    if(shared(n)){
+      a = ST.slice(0, 6).concat([PAIR]);
+      if(k >= 8) a.push(PULL);
+      if(k >= 9) a.push(BW);
+      return a;
+    }
+    a = ST.slice(0, 8);
     if(k >= 9) a.push(PULL);
     if(k >= 10) a.push(BW);
     return a;
@@ -343,7 +381,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       add({kind:"prep", zone:"warm", lap:true, col:col, name:"Warm-up lap "+(i+1)+" of "+N, dur:lapDur, r:i, st:true, note:"Try the station and pick your level for the real lap."});
       add({kind:"change", lapMove:true, col:col, name:"Move on", dur:T.lapMove, r:(i+1)%N, st:true, sub: i===N-1 ? "Back to your starting station." : "Next station."});
     }
-    add({kind:"prep", name:"Rest", dur:T.rest, r:0, st:true, sub:"Drink. Be at your starting station with your level picked."});
+    add({kind:"prep", rest:true, name:"Rest", dur:T.rest, r:0, st:true, sub:"Drink. Be at your starting station with your level picked."});
     for(i=0;i<N;i++){
       var sc = fade(GREEN, YELLOW, N > 1 ? i/(N-1) : 1);
       add({kind:"station", zone:"main", col:sc, name:"Station "+(i+1)+" of "+N, dur:stDur, r:i, st:true, note:""});
@@ -362,7 +400,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   }
 
   // ---- state (kept on this phone so a reload carries on) ----
-  var S = {count:8, start:-1, coach:false, level:0, on:false, running:false, base:0, at:0};
+  var S = {count:8, start:-1, coach:false, level:0, on:false, running:false, base:0, at:0, log:{}};
   try{
     var saved = JSON.parse(localStorage.getItem("circuit-run") || "null");
     if(saved && typeof saved === "object" && Date.now() - (saved.at||0) < 3*3600*1000) Object.assign(S, saved);
@@ -385,6 +423,50 @@ button{font:inherit;color:inherit;cursor:pointer}
   }
   function drawHr(){
     $("hrkey").textContent = "Heart rate, rough guide. Warm-up "+hrRange("warm")+". Circuit "+hrRange("main")+". Intervals "+hrRange("hard")+".";
+  }
+  var myName = "";
+  try{ myName = localStorage.getItem("circuit-name") || ""; }catch(e){}
+  function workSeconds(lv, dur){
+    var pt = pat(lv, dur); if(!pt) return dur;
+    var e = 0, w = 0;
+    while(e < dur){ var on = Math.min(pt[0], dur-e); w += on; e += on + pt[1]; }
+    return w;
+  }
+  function drawFinish(){
+    var box = $("finish"); box.innerHTML = "";
+    var laps = phases.filter(function(p){ return p.lap; }), sts = phases.filter(function(p){ return p.kind === "station"; });
+    var warm = laps.reduce(function(a, p){ return a + p.dur; }, 0);
+    var hard = phases.filter(function(p){ return p.kind === "hard"; }).reduce(function(a, p){ return a + p.dur; }, 0);
+    var circuit = 0, levels = [];
+    sts.forEach(function(p){
+      var l = (S.log && S.log[p.r] != null) ? S.log[p.r] : S.level, st = ACT[myStation(p)];
+      circuit += workSeconds(st.lv[l], p.dur);
+      levels.push(st.kit+" L"+(l+1));
+    });
+    var work = warm + circuit + hard;
+    box.appendChild(el("h2","","Well done"+(myName ? ", "+myName : "")+"."));
+    var dl = el("dl","");
+    function row(k, v, cls){ var dt = el("dt","",k), dd = el("dd","",v); if(cls){ dt.className = cls; dd.className = cls; } dl.appendChild(dt); dl.appendChild(dd); }
+    row("Stations completed", String(N));
+    row("Warm-up", fmt(warm));
+    if(!S.coach) row("Circuit work", fmt(circuit));
+    row("Harder intervals", fmt(hard));
+    var tot = el("div","total"); tot.style.display = "contents";
+    var dt = el("dt","","Total work"), dd = el("dd","",fmt(S.coach ? warm + hard + sts.length*sts[0].dur : work)+" of "+fmt(total));
+    tot.appendChild(dt); tot.appendChild(dd); dl.appendChild(tot);
+    box.appendChild(dl);
+    if(S.coach) return;
+    box.appendChild(el("div","lv","Levels: "+levels.join(", ")));
+    var text = SESSION_DATE+" circuit | "+(myName || "No name")+" | "+N+" stations | work "+fmt(work)+" of "+fmt(total)+" | "+levels.join(", ");
+    var wa = el("a","btn","Send my result on WhatsApp");
+    wa.href = "https://wa.me/?text="+encodeURIComponent(text); wa.target = "_blank"; wa.rel = "noopener";
+    box.appendChild(wa);
+    var cp = el("button","btn","Copy my result");
+    cp.addEventListener("click", function(){
+      try{ navigator.clipboard.writeText(text).then(function(){ cp.textContent = "Copied"; }, function(){ cp.textContent = "Could not copy. Take a screenshot."; }); }
+      catch(e){ cp.textContent = "Could not copy. Take a screenshot."; }
+    });
+    box.appendChild(cp);
   }
   function t(){ return S.running ? Math.min(total, S.base + (Date.now()-S.at)/1000) : S.base; }
   function indexAt(x){ var i = phases.length-1; while(i>0 && starts[i] > x) i--; return i; }
@@ -439,7 +521,8 @@ button{font:inherit;color:inherit;cursor:pointer}
     var note = N+" stations";
     if(N === 9) note += ": sled pull added";
     if(N === 10) note += ": sled pull and bodyweight added";
-    note += shared(S.count) ? ". Up to two people on each." : S.count <= 8 ? ". One person on each. With fewer than 8, some stations sit empty." : ". One person on each.";
+    if(shared(S.count)) note += ", with the HIIT machine and BikeErg as one";
+    note += S.count > 18 ? ". Two on each, three on the treadmills and bodyweight." : shared(S.count) ? ". Up to two people on each." : S.count <= 8 ? ". One person on each. With fewer than 8, some stations sit empty." : ". One person on each.";
     $("countnote").textContent = note+" Everyone must set the same number.";
     $("pickhelp").textContent = (shared(S.count) ? "Up to two people per station." : "One person per station.")+" Then everyone presses Start together when the coach says go.";
     $("planlap").textContent = "Warm-up lap: "+mins(build.lap)+" on every station, easy";
@@ -452,8 +535,10 @@ button{font:inherit;color:inherit;cursor:pointer}
     $("start").textContent = !ready ? "Pick a station" : S.on ? "Back to session" : "Start";
   }
 
-  var home = false;
+  var home = false, step = 1;
   function show(){
+    if(S.on) step = 2;
+    $("step1").hidden = step !== 1; $("step2").hidden = step !== 2;
     var running = S.on && !home;
     $("setup").hidden = running;
     $("run").hidden = !running;
@@ -479,7 +564,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     if(!show) return;
     var s = myStation(ph), st = ACT[s];
     var head = el("div","cardhead");
-    head.appendChild(el("div","lab",(ph.kind === "change" ? "Move to station " : "You are on station ")+(s+1)));
+    head.appendChild(el("div","lab",(ph.kind === "change" ? "Move to station " : ph.rest ? "Rest. You start on station " : "You are on station ")+(s+1)));
     var left = el("div","left",""); left.id = "cardleft"; head.appendChild(left);
     box.appendChild(head);
     box.appendChild(el("div","kit",st.kit));
@@ -564,6 +649,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     b.classList.toggle("paused", !S.running);
   }
 
+  var finished = false;
   var lastUntil = "";
   function drawUntil(){
     var left = Math.ceil((CLASS_START.getTime() - Date.now())/1000), box = $("until"), txt;
@@ -583,6 +669,13 @@ button{font:inherit;color:inherit;cursor:pointer}
     if(S.on){
       var x = t();
       if(S.running && x >= total){ S.running = false; S.base = total; save(); longBeep(); setGo(); }
+      var over = x >= total;
+      if(over !== finished){
+        finished = over;
+        $("finish").hidden = !over; $("clock").hidden = over;
+        if(over){ drawFinish(); $("mine").hidden = true; $("cues").hidden = true; $("stations").hidden = true; }
+        else { lastIdx = -1; }
+      }
       var idx = indexAt(Math.min(x, total-0.001));
       var ph = phases[idx], e = Math.min(ph.dur-0.001, x - starts[idx]), rem = ph.dur - (x - starts[idx]);
       if(idx !== lastIdx){
@@ -604,6 +697,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       $("togo").textContent = fmt(total - gone);
       $("head").style.left = "calc("+(x/total*100)+"% - 1px)";
 
+      if(ph.kind === "station" && !S.coach && S.running){ if(!S.log) S.log = {}; S.log[ph.r] = S.level; }
       if(ph.kind === "station"){
         if(S.coach){
           chips.forEach(function(c){
@@ -633,7 +727,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     if(!(S.coach || S.start >= 0)) return;
     audio(); wake();
     if(S.on){ home = false; show(); return; }
-    S.on = true; S.running = true; S.base = 0; S.at = Date.now(); lastIdx = -1; save();
+    S.on = true; S.running = true; S.base = 0; S.at = Date.now(); S.log = {}; lastIdx = -1; save();
     show(); setGo(); tone(880,0.3);
   });
   $("go").addEventListener("click", function(){
@@ -650,7 +744,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   $("reset").addEventListener("click", function(){
     if(Date.now() - armed > 3000){ armed = Date.now(); this.textContent = "Tap again to reset"; var b = this; setTimeout(function(){ b.textContent = "Reset"; }, 3000); return; }
     armed = 0; this.textContent = "Reset";
-    S.on = false; S.running = false; S.base = 0; S.start = -1; S.coach = false; S.level = 0; home = false; lastIdx = -1; save(); show();
+    S.on = false; S.running = false; S.base = 0; S.start = -1; S.coach = false; S.level = 0; S.log = {}; home = false; step = 1; lastIdx = -1; finished = false; $("finish").hidden = true; $("clock").hidden = false; save(); show();
   });
   function setCount(n){
     if(S.on || n < MIN_PEOPLE || n > MAX_PEOPLE) return;
@@ -660,7 +754,9 @@ button{font:inherit;color:inherit;cursor:pointer}
   }
   $("less").addEventListener("click", function(){ setCount(S.count - 1); });
   $("more").addEventListener("click", function(){ setCount(S.count + 1); });
-  $("home").addEventListener("click", function(){ home = true; show(); });
+  $("home").addEventListener("click", function(){ home = true; if(!S.on) step = 1; show(); window.scrollTo(0, 0); });
+  $("tostep2").addEventListener("click", function(){ step = 2; show(); window.scrollTo(0, 0); });
+  $("tostep1").addEventListener("click", function(){ if(S.on) return; step = 1; show(); window.scrollTo(0, 0); });
   $("sound").addEventListener("click", function(){
     audio(); soundOn = !soundOn;
     this.setAttribute("aria-pressed", String(soundOn));
@@ -672,6 +768,11 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   $("date").textContent = SESSION_DATE;
   if(age) $("age").value = age;
+  $("name").value = myName;
+  $("name").addEventListener("input", function(){
+    myName = this.value.trim();
+    try{ localStorage.setItem("circuit-name", myName); }catch(e){}
+  });
   drawHr();
   $("age").addEventListener("input", function(){
     age = parseInt(this.value, 10) || 0;
